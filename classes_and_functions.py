@@ -7,6 +7,7 @@ import pytest
 import qiskit
 import qiskit_aer
 import array
+from enum import Enum
 
 
 class Z2(int):
@@ -42,12 +43,16 @@ class Z2(int):
     def __repr__(self):
         return f"Z2({super().__repr__()})"
 
+class VEC_TYPE(Enum):
+    COLUMN = 0
+    ROW = 1
 
 class Z2_vector:
     def __init__(self, _list: list[int]):
         if not isinstance(_list, list):
             raise ValueError(f"Z2_vector Construction Error: expected a list[int], got {_list}")
 
+        self.type = VEC_TYPE.COLUMN # assumed to be column by default
         self.DIM = len(_list)
         self._vec = array.array('i', [0] * self.DIM)
 
@@ -59,9 +64,14 @@ class Z2_vector:
 
         # if we get here, then the input is a valid list of Z2 objects   
     
+    def T(self):
+        transposed = Z2_vector(self._vec)
+        transposed.type = 1 - transposed.type
+        return transposed
+
     def __add__(self, other):
         if not isinstance(other, Z2_vector): return NotImplemented
-        if self.DIM != other.DIM:
+        if self.DIM != other.DIM or self.type != other.type:
             raise ValueError(f"Z2_vector Addition Error: you cannot add or subtract vectors with different dimensions.")
         _new_vec = list()
         for x, y in zip(self._vec, other._vec):
@@ -81,9 +91,13 @@ class Z2_vector:
     def __truediv__(self, other):
         if not isinstance(other, Z2): return NotImplemented
         return self.__mul__(1/other)
+
+    def __matmul__(self, other):
+        if not isinstance(other, Z2_vector): return NotImplemented
+        # TODO: Implement this first then move on to Z2_matrix. Note: use 
         
 class Z2_matrix:
-    def __init__(self, _mat: list[list[Z2]]):
+    def __init__(self, _table: list[list[Z2]]):
         pass
             
 
