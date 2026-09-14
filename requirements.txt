@@ -1,0 +1,9 @@
+jupyterlab
+numpy
+matplotlib
+networkx
+seaborn
+pytest
+qiskit
+qiskit-aer
+ipykernel
