@@ -1,2 +1,2 @@
 # QEC-Pipeline
-This is a proof of concept, and script I'm implementing that will allow for users to specify a quantum error correction code and a Qiskit Circuit, and provide a new Qiskit Circuit, which is a fault tolerant version of the input circuit, using that code as output. 
+This is a proof of concept, and script I'm implementing that will allow for users to specify a quantum error correction code and a Qiskit Circuit, and provide a new Qiskit Circuit, which is a fault tolerant version of the input circuit, using that code as output. I am writing a majority of all the math on my own, which is almost necessary here as this requires a lot of linear algebra over a custom finite fiend (Z2). 

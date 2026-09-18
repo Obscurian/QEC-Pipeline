@@ -13,11 +13,11 @@ class Phase(IntEnum):
 
 class StabilizerCode:
     def __init__(self, stab_gens: Z2_matrix, phases: list[Phase]):
-        if (stab_gens.M%2 != 0):
+        if (stab_gens.NUM_COLS%2 != 0):
             raise ValueError(f"StabilizerCode Error: Matrix must have an even number of columns.")
         self.phases = phases
-        self.K = stab_gens.M
-        self.N = stab_gens.N/2
+        self.K = stab_gens.NUM_COLS
+        self.N = stab_gens.NUM_ROWS/2
         self.D_BOUND = None # compute this later via heuristic (maybe add support to exact computing of it) 
         self.is_css = None
         self.stabilizers = None 
