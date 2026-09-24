@@ -67,6 +67,12 @@ class Z2_vector:
         except ValueError as original_error:
             raise ValueError("Z2_vector Assignment Error: Invalid input data.") from original_error
 
+    def __eq__(self, value):
+        if isinstance(value, Z2_vector):
+            if self._vec == value._vec:
+                return self.type == value.type
+        return False
+
     def __add__(self, other):
         if not isinstance(other, Z2_vector): return NotImplemented
         if self.DIM != other.DIM or self.type != other.type:
@@ -140,6 +146,10 @@ class Z2_matrix:
 
         self._mat =  [[Z2(y) for y in x] for x in _table]
 
+    def __eq__(self, value):
+        if isinstance(value, Z2_matrix):
+            return self._mat == value._mat
+
     def copy(self):
         return Z2_matrix.create(self._mat)
 
@@ -176,7 +186,7 @@ class Z2_matrix:
             rows = []
             for row in self.rref:
                 if Z2(1) in row:
-                    rows.append(Z2_vector(row).T())
+                    rows.append(Z2_vector(row))
 
             self._rowsp_cache = rows
 
@@ -197,19 +207,34 @@ class Z2_matrix:
             self._colsp_cache = [self.get_col(i) for i in pivots]
 
         return self._colsp_cache
-            
+
     @property
     def kernel(self):
         '''List of basis vectors for the null space.'''
         if not hasattr(self, '_ker_cache'):
-            pivots = []
+            pivot_row_map = {}
             for i, row in enumerate(self.rref):
                 j_max = 0
                 while j_max < self.NUM_COLS and row[j_max] == Z2(0):
                     j_max += 1
                 if j_max != self.NUM_COLS:
-                    pivots.append(i)
-        # Now, what? 
+                    pivot_row_map[i] = j_max
+
+            frees = [j for j in range(self.NUM_COLS) if j not in pivot_row_map.values()]
+
+            basis = []
+
+            for f in frees:
+                _vec = [Z2(0) for _ in range(self.NUM_COLS)]
+                _vec[f] = Z2(1)
+                for i, j in pivot_row_map.items():
+                    _vec[j] = self.rref[i][f]
+
+                basis.append(Z2_vector(_vec))
+            
+            self._ker_cache = basis
+
+        return self._ker_cache
     
     def __row_reduce__(self, _auth_key=None):
         '''Do not use this. It is a private method that is called implicitly. Algorithm from: https://en.wikipedia.org/wiki/Gaussian_elimination'''
@@ -321,8 +346,13 @@ class Z2_matrix:
             _list.append(row[i])
         return Z2_vector(_list)
     
-    def __getitem__(self, index: int) -> list[Z2]:
-        return self._mat[index]
+    def __getitem__(self, key) -> list[Z2]:
+        if isinstance(key, tuple):
+            row, col = key
+            return self.data[row][col]
+        if isinstance(key, int):
+            return self._mat[key]
+        else: raise ValueError(f"Z2_matrix Error. Invalid index {key}. Expected int or tuple.")
     
     def __add__(self, other):
             if not isinstance(other, Z2_matrix): return NotImplemented
