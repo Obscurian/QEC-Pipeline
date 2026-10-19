@@ -2,8 +2,8 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 authors:
   - family-names: "Nandakumar"
-  given-names: "Smayan"
-  orcid: "https://orcid.org/0009-0007-4869-0011"
+    given-names: "Smayan"
+    orcid: "https://orcid.org/0009-0007-4869-0011"
 title: "QEC-Pipeline: An End-to-End Quantum Error Correction Pipeline"
 version: "0.0.1"
 date-released: 2026-09-13
